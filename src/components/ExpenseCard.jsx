@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Card, Text, IconButton, Avatar } from 'react-native-paper';
+import { Card, Text, IconButton, Avatar, useTheme } from 'react-native-paper';
 
 /**
  * Props:
@@ -10,6 +10,7 @@ import { Card, Text, IconButton, Avatar } from 'react-native-paper';
  *  - onDelete: () => void
  */
 const ExpenseCard = ({ expense, members = [], userId, onDelete }) => {
+  const theme = useTheme();
   const { description, amount, paid_by, split_among = [], profiles } = expense;
 
   const paidByName = profiles?.name || 'Someone';
@@ -36,16 +37,16 @@ const ExpenseCard = ({ expense, members = [], userId, onDelete }) => {
           <Avatar.Text
             size={40}
             label={paidByName.slice(0, 2).toUpperCase()}
-            style={styles.avatar}
+            style={[styles.avatar, { backgroundColor: theme.colors.primary }]}
           />
           <View style={styles.info}>
             <Text variant="titleSmall" numberOfLines={1}>{description}</Text>
-            <Text style={styles.payer}>Paid by {paidByName}</Text>
+            <Text style={[styles.payer, { color: theme.colors.onSurfaceVariant }]}>Paid by {paidByName}</Text>
             {myLabel ? <Text style={[styles.myLabel, iYouPaid && styles.positive]}>{myLabel}</Text> : null}
           </View>
           <View style={styles.right}>
-            <Text variant="titleMedium" style={styles.amount}>${Number(amount).toFixed(2)}</Text>
-            <Text style={styles.perPerson}>${perPerson}/person</Text>
+            <Text variant="titleMedium" style={[styles.amount, { color: theme.colors.onSurface }]}>${Number(amount).toFixed(2)}</Text>
+            <Text style={[styles.perPerson, { color: theme.colors.onSurfaceVariant }]}>${perPerson}/person</Text>
             {onDelete && (
               <IconButton
                 icon="delete-outline"
@@ -80,7 +81,6 @@ const styles = StyleSheet.create({
   },
   payer: {
     fontSize: 12,
-    color: '#757575',
     marginTop: 2,
   },
   myLabel: {
@@ -97,11 +97,9 @@ const styles = StyleSheet.create({
   },
   amount: {
     fontWeight: '700',
-    color: '#1A1A1A',
   },
   perPerson: {
     fontSize: 11,
-    color: '#9E9E9E',
   },
   deleteBtn: {
     margin: 0,

@@ -1,7 +1,7 @@
 // Heart-based 1–3 voting system for activities.
 import React from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { Text } from "react-native-paper";
+import { Text, useTheme } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 
 const HEARTS = [1, 2, 3];
@@ -13,6 +13,7 @@ const HEARTS = [1, 2, 3];
  *  - onVote: (voteValue) => void
  */
 const VoteButtons = ({ votes = [], userId, onVote }) => {
+  const theme = useTheme();
   // Find current user's vote
   const myVote = votes.find((v) => v.user_id === userId);
   const myVoteValue = myVote?.vote_value || 0;
@@ -45,13 +46,13 @@ const VoteButtons = ({ votes = [], userId, onVote }) => {
               <Ionicons
                 name={filled ? "heart" : "heart-outline"}
                 size={22}
-                color={filled ? "#E53935" : "#9E9E9E"}
+                color={filled ? "#E53935" : theme.colors.onSurfaceVariant}
               />
             </TouchableOpacity>
           );
         })}
       </View>
-      <Text style={styles.scoreText}>
+      <Text style={[styles.scoreText, { color: theme.colors.onSurfaceVariant }]}>
         {totalScore} {voteCount > 0 ? `(${voteCount})` : ""}
       </Text>
     </View>
@@ -73,7 +74,6 @@ const styles = StyleSheet.create({
   },
   scoreText: {
     fontSize: 12,
-    color: "#757575",
     minWidth: 36,
   },
 });

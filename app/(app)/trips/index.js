@@ -1,4 +1,4 @@
-// Main screen
+// Main screen: shows all the user's trips and lets them create/join trips.
 import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
@@ -20,16 +20,20 @@ import {
   Chip,
   ActivityIndicator,
 } from "react-native-paper";
+
 import { router } from "expo-router";
 import { format, parseISO } from "date-fns";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "react-native-paper";
 import useAuthStore from "../../../src/store/authStore";
 import useTripStore from "../../../src/store/tripStore";
+import useThemeStore from "../../../src/store/themeStore";
 
 export default function TripsScreen() {
+  const theme = useTheme();
   const { user, profile, logout } = useAuthStore();
   const { trips, loading, fetchTrips, joinTrip } = useTripStore();
-
+  const { isDarkMode, toggleTheme } = useThemeStore();
   const [joinVisible, setJoinVisible] = useState(false);
   const [inviteCode, setInviteCode] = useState("");
   const [joining, setJoining] = useState(false);
@@ -82,14 +86,14 @@ export default function TripsScreen() {
               <View style={{ flex: 1 }}>
                 <Text
                   variant="titleMedium"
-                  style={styles.tripTitle}
+                  style={dynamicStyles.tripTitle}
                   numberOfLines={1}
                 >
                   {item.title}
                 </Text>
                 <View style={styles.destinationRow}>
-                  <Ionicons name="location-outline" size={14} color="#757575" />
-                  <Text style={styles.destination}>{item.destination}</Text>
+                  <Ionicons name="location-outline" size={14} color={theme.colors.onSurfaceVariant} />
+                  <Text style={dynamicStyles.destination}>{item.destination}</Text>
                 </View>
               </View>
               <Chip
@@ -104,16 +108,16 @@ export default function TripsScreen() {
               </Chip>
             </View>
             <View style={styles.dates}>
-              <Ionicons name="calendar-outline" size={13} color="#757575" />
-              <Text style={styles.dateText}>
+              <Ionicons name="calendar-outline" size={13} color={theme.colors.onSurfaceVariant} />
+              <Text style={dynamicStyles.dateText}>
                 {format(parseISO(item.start_date), "MMM d")} –{" "}
                 {format(parseISO(item.end_date), "MMM d, yyyy")}
               </Text>
             </View>
             {item.budget ? (
               <View style={styles.dates}>
-                <Ionicons name="wallet-outline" size={13} color="#757575" />
-                <Text style={styles.dateText}>
+                <Ionicons name="wallet-outline" size={13} color={theme.colors.onSurfaceVariant} />
+                <Text style={dynamicStyles.dateText}>
                   Budget: ${Number(item.budget).toLocaleString()}
                 </Text>
               </View>
@@ -124,8 +128,10 @@ export default function TripsScreen() {
     );
   };
 
+  const dynamicStyles = getDynamicStyles(theme);
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Appbar.Header elevated>
         <Appbar.Content title="My Trips" titleStyle={styles.appbarTitle} />
         <Appbar.Action
@@ -133,20 +139,25 @@ export default function TripsScreen() {
           onPress={() => setJoinVisible(true)}
           tooltip="Join trip"
         />
+        <Appbar.Action
+          icon={isDarkMode ? "white-balance-sunny" : "moon-waning-crescent"}
+          onPress={toggleTheme}
+          tooltip={isDarkMode ? "Light mode" : "Dark mode"}
+        />
         <Appbar.Action icon="logout" onPress={handleLogout} />
       </Appbar.Header>
 
       {loading && trips.length === 0 ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color="#6750A4" />
+          <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
       ) : trips.length === 0 ? (
         <View style={styles.empty}>
-          <Ionicons name="airplane-outline" size={80} color="#C4B5FD" />
-          <Text variant="headlineSmall" style={styles.emptyTitle}>
+          <Ionicons name="airplane-outline" size={80} color={theme.colors.primary} />
+          <Text variant="headlineSmall" style={dynamicStyles.emptyTitle}>
             No trips yet
           </Text>
-          <Text style={styles.emptySubtitle}>
+          <Text style={dynamicStyles.emptySubtitle}>
             Create a trip or join one with an invite code
           </Text>
           <Button
@@ -168,7 +179,7 @@ export default function TripsScreen() {
             <RefreshControl refreshing={loading} onRefresh={onRefresh} />
           }
           ListHeaderComponent={
-            <Text style={styles.greeting}>
+            <Text style={dynamicStyles.greeting}>
               Hey {profile?.name?.split(" ")[0] || "traveller"} 👋
             </Text>
           }
@@ -183,12 +194,12 @@ export default function TripsScreen() {
             setJoinVisible(false);
             setInviteCode("");
           }}
-          contentContainerStyle={styles.modal}
+          contentContainerStyle={dynamicStyles.modal}
         >
-          <Text variant="headlineSmall" style={styles.modalTitle}>
+            <Text variant="headlineSmall" style={dynamicStyles.modalTitle}>
             Join a Trip
           </Text>
-          <Text style={styles.modalSubtitle}>
+          <Text style={dynamicStyles.modalSubtitle}>
             Enter the invite code shared by your group
           </Text>
           <TextInput
@@ -216,7 +227,7 @@ export default function TripsScreen() {
 
       <FAB
         icon="plus"
-        style={styles.fab}
+        style={dynamicStyles.fab}
         onPress={() => router.push("/(app)/trips/create")}
         label="New trip"
       />
@@ -232,59 +243,64 @@ export default function TripsScreen() {
   );
 }
 
+const getDynamicStyles = (theme) =>
+  StyleSheet.create({
+    container: { flex: 1 },
+    greeting: {
+      fontSize: 16,
+      color: theme.colors.onSurfaceVariant,
+      marginVertical: 16,
+      fontWeight: "500",
+    },
+    tripTitle: { fontWeight: "700", color: theme.colors.onSurface },
+    destination: { fontSize: 13, color: theme.colors.onSurfaceVariant },
+    dateText: { fontSize: 13, color: theme.colors.onSurfaceVariant },
+    emptyTitle: { marginTop: 16, fontWeight: "700", color: theme.colors.onSurface },
+    emptySubtitle: {
+      color: theme.colors.onSurfaceVariant,
+      textAlign: "center",
+      marginTop: 8,
+      lineHeight: 22,
+    },
+    fab: {
+      position: "absolute",
+      right: 16,
+      bottom: 24,
+      backgroundColor: theme.colors.primary,
+    },
+    modal: {
+      backgroundColor: theme.colors.surface,
+      margin: 24,
+      borderRadius: 16,
+      padding: 24,
+    },
+    modalTitle: { fontWeight: "700", marginBottom: 8, color: theme.colors.onSurface },
+    modalSubtitle: { color: theme.colors.onSurfaceVariant, marginBottom: 16 },
+  });
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F6F0FF" },
+  container: { flex: 1 },
   appbarTitle: { fontWeight: "700" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   list: { paddingHorizontal: 16, paddingBottom: 100 },
-  greeting: {
-    fontSize: 16,
-    color: "#49454F",
-    marginVertical: 16,
-    fontWeight: "500",
-  },
   tripCard: { marginVertical: 6, borderRadius: 14, elevation: 2 },
   cardHeader: { flexDirection: "row", alignItems: "flex-start", gap: 8 },
-  tripTitle: { fontWeight: "700", color: "#1D1B20" },
   destinationRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
     marginTop: 2,
   },
-  destination: { fontSize: 13, color: "#757575" },
-  statusChip: { height: 26 },
-  statusText: { fontSize: 11, fontWeight: "600" },
+  statusChip: { maxHeight: 30, alignSelf: "flex-start", maxWidth: 120 },
+  statusText: { fontSize: 11, fontWeight: "600",padding: 0, margin: 0,},
   dates: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 6 },
-  dateText: { fontSize: 13, color: "#757575" },
   empty: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 32,
   },
-  emptyTitle: { marginTop: 16, fontWeight: "700", color: "#1D1B20" },
-  emptySubtitle: {
-    color: "#757575",
-    textAlign: "center",
-    marginTop: 8,
-    lineHeight: 22,
-  },
   emptyBtn: { marginTop: 20 },
-  fab: {
-    position: "absolute",
-    right: 16,
-    bottom: 24,
-    backgroundColor: "#6750A4",
-  },
-  modal: {
-    backgroundColor: "white",
-    margin: 24,
-    borderRadius: 16,
-    padding: 24,
-  },
-  modalTitle: { fontWeight: "700", marginBottom: 8 },
-  modalSubtitle: { color: "#757575", marginBottom: 16 },
   codeInput: { marginBottom: 16, letterSpacing: 4, fontSize: 20 },
   modalBtns: { flexDirection: "row", justifyContent: "flex-end", gap: 8 },
 });

@@ -13,12 +13,14 @@ import {
   Text,
   HelperText,
   Surface,
+  useTheme,
 } from "react-native-paper";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import useAuthStore from "../../src/store/authStore";
 
 export default function LoginScreen() {
+  const theme = useTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -51,7 +53,7 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      style={styles.flex}
+      style={[styles.flex, { backgroundColor: theme.colors.background }]}
     >
       <ScrollView
         contentContainerStyle={styles.container}
@@ -59,18 +61,27 @@ export default function LoginScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Ionicons name="airplane" size={56} color="#6750A4" />
-          <Text variant="displaySmall" style={styles.title}>
+          <Ionicons name="airplane" size={56} color={theme.colors.primary} />
+          <Text
+            variant="displaySmall"
+            style={[styles.title, { color: theme.colors.onBackground }]}
+          >
             GroupTrip
           </Text>
-          <Text variant="bodyLarge" style={styles.subtitle}>
+          <Text
+            variant="bodyLarge"
+            style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}
+          >
             Plan adventures together
           </Text>
         </View>
 
         {/* Form */}
         <Surface style={styles.form} elevation={2}>
-          <Text variant="headlineSmall" style={styles.formTitle}>
+          <Text
+            variant="headlineSmall"
+            style={[styles.formTitle, { color: theme.colors.onSurface }]}
+          >
             Welcome back
           </Text>
 
@@ -138,8 +149,9 @@ export default function LoginScreen() {
           onPress={() => router.push("/(auth)/register")}
           style={styles.link}
         >
-          <Text style={styles.linkText}>
-            Don't have an account? <Text style={styles.linkBold}>Sign Up</Text>
+          <Text style={[styles.linkText, { color: theme.colors.onSurfaceVariant }]}>
+            Don't have an account?{" "}
+            <Text style={[styles.linkBold, { color: theme.colors.primary }]}>Sign Up</Text>
           </Text>
         </TouchableOpacity>
       </ScrollView>
@@ -148,18 +160,18 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: "#F6F0FF" },
+  flex: { flex: 1 },
   container: { flexGrow: 1, justifyContent: "center", padding: 24 },
   header: { alignItems: "center", marginBottom: 32 },
-  title: { fontWeight: "800", color: "#1D1B20", marginTop: 8 },
-  subtitle: { color: "#49454F", marginTop: 4 },
+  title: { fontWeight: "800", marginTop: 8 },
+  subtitle: { marginTop: 4 },
   form: { borderRadius: 16, padding: 24 },
-  formTitle: { fontWeight: "700", marginBottom: 16, color: "#1D1B20" },
+  formTitle: { fontWeight: "700", marginBottom: 16 },
   input: { marginBottom: 4 },
   apiError: { fontSize: 14, marginBottom: 8 },
   loginBtn: { marginTop: 8, borderRadius: 28 },
   loginBtnContent: { paddingVertical: 6 },
   link: { alignItems: "center", marginTop: 24 },
-  linkText: { color: "#49454F" },
-  linkBold: { color: "#6750A4", fontWeight: "700" },
+  linkText: {},
+  linkBold: { fontWeight: "700" },
 });

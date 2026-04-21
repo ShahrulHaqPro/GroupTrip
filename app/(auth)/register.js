@@ -14,12 +14,14 @@ import {
   HelperText,
   Surface,
   Snackbar,
+  useTheme,
 } from "react-native-paper";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import useAuthStore from "../../src/store/authStore";
 
 export default function RegisterScreen() {
+  const theme = useTheme();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -58,7 +60,7 @@ export default function RegisterScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      style={styles.flex}
+      style={[styles.flex, { backgroundColor: theme.colors.background }]}
     >
       <ScrollView
         contentContainerStyle={styles.container}
@@ -69,13 +71,18 @@ export default function RegisterScreen() {
             onPress={() => router.back()}
             style={styles.backBtn}
           >
-            <Ionicons name="arrow-back" size={24} color="#6750A4" />
+            <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
           </TouchableOpacity>
-          <Ionicons name="airplane" size={48} color="#6750A4" />
-          <Text variant="headlineMedium" style={styles.title}>
+          <Ionicons name="airplane" size={48} color={theme.colors.primary} />
+          <Text
+            variant="headlineMedium"
+            style={[styles.title, { color: theme.colors.onBackground }]}
+          >
             Create account
           </Text>
-          <Text style={styles.subtitle}>Join GroupTrip and start planning</Text>
+          <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
+            Join GroupTrip and start planning
+          </Text>
         </View>
 
         <Surface style={styles.form} elevation={2}>
@@ -168,9 +175,9 @@ export default function RegisterScreen() {
         </Surface>
 
         <TouchableOpacity onPress={() => router.back()} style={styles.link}>
-          <Text style={styles.linkText}>
+          <Text style={[styles.linkText, { color: theme.colors.onSurfaceVariant }] }>
             Already have an account?{" "}
-            <Text style={styles.linkBold}>Sign In</Text>
+            <Text style={[styles.linkBold, { color: theme.colors.primary }]}>Sign In</Text>
           </Text>
         </TouchableOpacity>
       </ScrollView>
@@ -187,17 +194,17 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: "#F6F0FF" },
+  flex: { flex: 1 },
   container: { flexGrow: 1, padding: 24 },
   header: { alignItems: "center", marginVertical: 24 },
   backBtn: { position: "absolute", left: 0, top: 0 },
-  title: { fontWeight: "700", marginTop: 8, color: "#1D1B20" },
-  subtitle: { color: "#49454F", marginTop: 4 },
+  title: { fontWeight: "700", marginTop: 8 },
+  subtitle: { marginTop: 4 },
   form: { borderRadius: 16, padding: 24 },
   input: { marginBottom: 4 },
   btn: { marginTop: 8, borderRadius: 28 },
   btnContent: { paddingVertical: 6 },
   link: { alignItems: "center", marginTop: 20 },
-  linkText: { color: "#49454F" },
-  linkBold: { color: "#6750A4", fontWeight: "700" },
+  linkText: {},
+  linkBold: { fontWeight: "700" },
 });

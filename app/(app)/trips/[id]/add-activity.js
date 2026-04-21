@@ -13,6 +13,7 @@ import {
   Text,
   HelperText,
   Snackbar,
+  useTheme,
 } from "react-native-paper";
 import { useLocalSearchParams, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -20,6 +21,7 @@ import useAuthStore from "../../../../src/store/authStore";
 import useTripStore from "../../../../src/store/tripStore";
 
 export default function AddActivityScreen() {
+  const theme = useTheme();
   const { id } = useLocalSearchParams();
   const { user } = useAuthStore();
   const { addActivity } = useTripStore();
@@ -73,7 +75,7 @@ export default function AddActivityScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      style={styles.flex}
+      style={[styles.flex, { backgroundColor: theme.colors.background }]}
     >
       <Appbar.Header elevated>
         <Appbar.BackAction onPress={() => router.back()} />
@@ -84,7 +86,7 @@ export default function AddActivityScreen() {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <Text variant="labelLarge" style={styles.section}>
+        <Text variant="labelLarge" style={[styles.section, { color: theme.colors.onSurface }]}> 
           Basic Info
         </Text>
 
@@ -122,7 +124,7 @@ export default function AddActivityScreen() {
             "Format: YYYY-MM-DDTHH:MM (e.g. 2025-07-15T14:00)"}
         </HelperText>
 
-        <Text variant="labelLarge" style={styles.section}>
+        <Text variant="labelLarge" style={[styles.section, { color: theme.colors.onSurface }]}> 
           Location
         </Text>
 
@@ -174,7 +176,7 @@ export default function AddActivityScreen() {
           </View>
         </View>
 
-        <Text variant="labelLarge" style={styles.section}>
+        <Text variant="labelLarge" style={[styles.section, { color: theme.colors.onSurface }]}> 
           Details
         </Text>
 
@@ -201,7 +203,11 @@ export default function AddActivityScreen() {
           left={
             <TextInput.Icon
               icon={() => (
-                <Ionicons name="cash-outline" size={24} color="#757575" />
+                <Ionicons
+                  name="cash-outline"
+                  size={24}
+                  color={theme.colors.onSurfaceVariant}
+                />
               )}
             />
           }
@@ -238,12 +244,11 @@ export default function AddActivityScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: "#F6F0FF" },
+  flex: { flex: 1 },
   appbarTitle: { fontWeight: "700" },
   container: { padding: 20, paddingBottom: 60 },
   section: {
     fontWeight: "700",
-    color: "#1D1B20",
     marginTop: 16,
     marginBottom: 6,
   },

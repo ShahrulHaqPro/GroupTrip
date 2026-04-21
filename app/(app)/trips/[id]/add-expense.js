@@ -15,13 +15,14 @@ import {
   HelperText,
   Checkbox,
   Snackbar,
-  Divider,
+  useTheme,
 } from "react-native-paper";
 import { useLocalSearchParams, router } from "expo-router";
 import useAuthStore from "../../../../src/store/authStore";
 import useTripStore from "../../../../src/store/tripStore";
 
 export default function AddExpenseScreen() {
+  const theme = useTheme();
   const { id } = useLocalSearchParams();
   const { user } = useAuthStore();
   const { members, fetchMembers, addExpense } = useTripStore();
@@ -92,7 +93,7 @@ export default function AddExpenseScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      style={styles.flex}
+      style={[styles.flex, { backgroundColor: theme.colors.background }]}
     >
       <Appbar.Header elevated>
         <Appbar.BackAction onPress={() => router.back()} />
@@ -103,7 +104,7 @@ export default function AddExpenseScreen() {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <Text variant="labelLarge" style={styles.section}>
+        <Text variant="labelLarge" style={[styles.section, { color: theme.colors.onSurface }]}> 
           Expense Details
         </Text>
 
@@ -141,7 +142,7 @@ export default function AddExpenseScreen() {
           {errors.amount}
         </HelperText>
 
-        <Text variant="labelLarge" style={styles.section}>
+        <Text variant="labelLarge" style={[styles.section, { color: theme.colors.onSurface }]}> 
           Paid by
         </Text>
         {members.map((member) => (
@@ -149,24 +150,37 @@ export default function AddExpenseScreen() {
             key={member.id}
             style={[
               styles.memberRow,
+              {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.outlineVariant,
+              },
               paidBy === member.id && styles.selectedRow,
+              paidBy === member.id && {
+                borderColor: theme.colors.primary,
+                backgroundColor: theme.colors.secondaryContainer,
+              },
             ]}
             onPress={() => setPaidBy(member.id)}
           >
             <View
               style={[
                 styles.radioCircle,
+                { borderColor: theme.colors.outline },
                 paidBy === member.id && styles.radioSelected,
+                paidBy === member.id && {
+                  borderColor: theme.colors.primary,
+                  backgroundColor: theme.colors.primary,
+                },
               ]}
             />
-            <Text style={styles.memberName}>
+            <Text style={[styles.memberName, { color: theme.colors.onSurface }]}>
               {member.name || member.email}
               {member.id === user.id ? " (you)" : ""}
             </Text>
           </TouchableOpacity>
         ))}
 
-        <Text variant="labelLarge" style={styles.section}>
+        <Text variant="labelLarge" style={[styles.section, { color: theme.colors.onSurface }]}> 
           Split among
         </Text>
         {errors.split ? (
@@ -181,9 +195,9 @@ export default function AddExpenseScreen() {
             <Checkbox
               status={splitAmong.includes(member.id) ? "checked" : "unchecked"}
               onPress={() => toggleSplit(member.id)}
-              color="#6750A4"
+              color={theme.colors.primary}
             />
-            <Text style={styles.memberName}>
+            <Text style={[styles.memberName, { color: theme.colors.onSurface }]}>
               {member.name || member.email}
               {member.id === user.id ? " (you)" : ""}
             </Text>
@@ -191,8 +205,13 @@ export default function AddExpenseScreen() {
         ))}
 
         {splitAmong.length > 0 && amount ? (
-          <View style={styles.summary}>
-            <Text style={styles.summaryText}>
+          <View
+            style={[
+              styles.summary,
+              { backgroundColor: theme.colors.secondaryContainer },
+            ]}
+          >
+            <Text style={[styles.summaryText, { color: theme.colors.primary }]}> 
               ${perPerson} per person ({splitAmong.length}{" "}
               {splitAmong.length === 1 ? "person" : "people"})
             </Text>
@@ -224,12 +243,11 @@ export default function AddExpenseScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: "#F6F0FF" },
+  flex: { flex: 1 },
   appbarTitle: { fontWeight: "700" },
   container: { padding: 20, paddingBottom: 60 },
   section: {
     fontWeight: "700",
-    color: "#1D1B20",
     marginTop: 16,
     marginBottom: 8,
   },
@@ -240,30 +258,26 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 10,
     marginBottom: 6,
-    backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#E7E0EC",
   },
-  selectedRow: { borderColor: "#6750A4", backgroundColor: "#F3EAF7" },
+  selectedRow: {},
   radioCircle: {
     width: 20,
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: "#9E9E9E",
     marginRight: 12,
   },
-  radioSelected: { borderColor: "#6750A4", backgroundColor: "#6750A4" },
+  radioSelected: {},
   checkRow: { flexDirection: "row", alignItems: "center", marginBottom: 4 },
-  memberName: { fontSize: 15, color: "#1D1B20" },
+  memberName: { fontSize: 15 },
   summary: {
-    backgroundColor: "#EDE7F6",
     borderRadius: 10,
     padding: 12,
     marginTop: 12,
     alignItems: "center",
   },
-  summaryText: { color: "#6750A4", fontWeight: "700", fontSize: 15 },
+  summaryText: { fontWeight: "700", fontSize: 15 },
   saveBtn: { marginTop: 24, borderRadius: 28 },
   saveBtnContent: { paddingVertical: 8 },
 });

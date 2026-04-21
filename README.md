@@ -68,7 +68,9 @@ Open `app.json` and fill in the `extra` section:
 ### 5. Run the app
 
 ```bash
-npx expo start
+npx expo start 
+(or)
+npm start
 ```
 
 ---
@@ -104,9 +106,11 @@ GroupTrip/
 │   │   └── aiService.js        # Groq API
 │   ├── store/
 │   │   ├── authStore.js        # Zustand auth state
+│   │   ├── themeStore.js        # Zustand theme state
 │   │   └── tripStore.js        # Zustand trip/activity/expense state
 │   └── utils/
-│       └── offlineSync.js      # AsyncStorage queue
+│       ├── offlineSync.js      # AsyncStorage queue
+│       └── theme.js        # Stored theme colors
 ├── supabase/
 │   └── migrations/
 │       └── 001_initial_schema.sql
@@ -215,7 +219,6 @@ Supabase Dashboard → Authentication → Providers → Email → toggle off "Co
 | Supabase Realtime | 200 concurrent connections |
 | Supabase Auth | Unlimited users |
 | Groq Cloud | 10,000 tokens/day per key |
-| Expo Go | Unlimited during development |
 
 All sufficient for a working MVP with real users.
 

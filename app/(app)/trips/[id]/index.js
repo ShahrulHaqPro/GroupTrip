@@ -1,4 +1,4 @@
-// Main trip detail screen with 4 tabs: Itinerary, Map, Expenses, Members.
+// Main trip detail screen with 4 tabs -> Itinerary, Map, Expenses, Members.
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
   View,
@@ -14,15 +14,12 @@ import {
   Appbar,
   Text,
   FAB,
-  Portal,
-  Modal,
   Button,
   Chip,
   Snackbar,
-  ActivityIndicator,
+  useTheme,
   Avatar,
   Surface,
-  Divider,
 } from "react-native-paper";
 import { useLocalSearchParams, router } from "expo-router";
 import { format, parseISO } from "date-fns";
@@ -42,6 +39,7 @@ import {
 const TABS = ["Itinerary", "Map", "Expenses", "Members"];
 
 export default function TripDetailScreen() {
+  const theme = useTheme();
   const { id } = useLocalSearchParams();
   const { user, profile } = useAuthStore();
   const {
@@ -164,9 +162,9 @@ export default function TripDetailScreen() {
       ListEmptyComponent={
         !activitiesLoading ? (
           <View style={styles.emptyTab}>
-            <Ionicons name="calendar-outline" size={56} color="#C4B5FD" />
-            <Text style={styles.emptyText}>No activities yet</Text>
-            <Text style={styles.emptySubText}>
+            <Ionicons name="calendar-outline" size={56} color={theme.colors.primary} />
+            <Text style={[styles.emptyText, { color: theme.colors.onSurface }]}>No activities yet</Text>
+            <Text style={[styles.emptySubText, { color: theme.colors.onSurfaceVariant }]}>
               Add your first activity or get AI suggestions
             </Text>
           </View>
@@ -196,9 +194,9 @@ export default function TripDetailScreen() {
       <View style={styles.mapContainer}>
         {mapActivities.length === 0 ? (
           <View style={styles.emptyTab}>
-            <Ionicons name="map-outline" size={56} color="#C4B5FD" />
-            <Text style={styles.emptyText}>No locations set</Text>
-            <Text style={styles.emptySubText}>
+            <Ionicons name="map-outline" size={56} color={theme.colors.primary} />
+            <Text style={[styles.emptyText, { color: theme.colors.onSurface }]}>No locations set</Text>
+            <Text style={[styles.emptySubText, { color: theme.colors.onSurfaceVariant }]}>
               Activities with lat/lng appear here
             </Text>
           </View>
@@ -218,7 +216,7 @@ export default function TripDetailScreen() {
                 }}
                 title={a.name}
                 description={a.address || ""}
-                pinColor="#6750A4"
+                pinColor={theme.colors.primary}
               />
             ))}
           </MapView>
@@ -261,7 +259,7 @@ export default function TripDetailScreen() {
             >
               {myBalance >= 0 ? "+" : ""}${Math.abs(myBalance).toFixed(2)}
             </Text>
-            <Text style={styles.balanceHint}>
+            <Text style={[styles.balanceHint, { color: theme.colors.onSurfaceVariant }]}>
               {myBalance > 0
                 ? "Others owe you"
                 : myBalance < 0
@@ -273,9 +271,9 @@ export default function TripDetailScreen() {
         ListEmptyComponent={
           !expensesLoading ? (
             <View style={styles.emptyTab}>
-              <Ionicons name="receipt-outline" size={56} color="#C4B5FD" />
-              <Text style={styles.emptyText}>No expenses yet</Text>
-              <Text style={styles.emptySubText}>
+              <Ionicons name="receipt-outline" size={56} color={theme.colors.primary} />
+              <Text style={[styles.emptyText, { color: theme.colors.onSurface }]}>No expenses yet</Text>
+              <Text style={[styles.emptySubText, { color: theme.colors.onSurfaceVariant }]}>
                 Log shared costs to track who owes what
               </Text>
             </View>
@@ -288,12 +286,12 @@ export default function TripDetailScreen() {
   const renderMembers = () => (
     <ScrollView contentContainerStyle={styles.tabContent}>
       {/* Invite code */}
-      <Surface style={styles.inviteCard} elevation={2}>
+      <Surface style={[styles.inviteCard, { backgroundColor: theme.colors.surface }]} elevation={2}>
         <Text variant="labelLarge" style={{ marginBottom: 4 }}>
           Invite Code
         </Text>
         <View style={styles.inviteRow}>
-          <Text variant="displaySmall" style={styles.inviteCode}>
+          <Text variant="displaySmall" style={[styles.inviteCode, { color: theme.colors.primary }]}>
             {currentTrip?.invite_code || "------"}
           </Text>
           <Button
@@ -305,7 +303,7 @@ export default function TripDetailScreen() {
             Copy
           </Button>
         </View>
-        <Text style={styles.inviteHint}>
+        <Text style={[styles.inviteHint, { color: theme.colors.onSurfaceVariant }]}>
           Share this code so others can join
         </Text>
       </Surface>
@@ -321,15 +319,15 @@ export default function TripDetailScreen() {
             label={(member.name || member.email || "U")
               .slice(0, 2)
               .toUpperCase()}
-            style={styles.memberAvatar}
+            style={[styles.memberAvatar, { backgroundColor: theme.colors.primaryContainer }]}
           />
           <View style={styles.memberInfo}>
             <Text variant="bodyLarge" style={{ fontWeight: "600" }}>
               {member.name || member.email}
             </Text>
-            <Text style={styles.memberEmail}>{member.email}</Text>
+            <Text style={[styles.memberEmail, { color: theme.colors.onSurfaceVariant }]}>{member.email}</Text>
           </View>
-          <Chip compact style={styles.roleChip}>
+          <Chip compact style={[styles.roleChip, { backgroundColor: theme.colors.secondaryContainer }]}>
             {member.role}
           </Chip>
         </View>
@@ -367,7 +365,7 @@ export default function TripDetailScreen() {
   const currentFABs = fabActions[activeTab];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Appbar.Header elevated>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content
@@ -378,15 +376,32 @@ export default function TripDetailScreen() {
       </Appbar.Header>
 
       {/* Tab bar */}
-      <View style={styles.tabBar}>
+      <View
+        style={[
+          styles.tabBar,
+          {
+            backgroundColor: theme.colors.surface,
+            borderBottomColor: theme.colors.outlineVariant,
+          },
+        ]}
+      >
         {TABS.map((tab, i) => (
           <TouchableOpacity
             key={tab}
-            style={[styles.tab, activeTab === i && styles.activeTab]}
+            style={[
+              styles.tab,
+              activeTab === i && styles.activeTab,
+              activeTab === i && { borderBottomColor: theme.colors.primary },
+            ]}
             onPress={() => setActiveTab(i)}
           >
             <Text
-              style={[styles.tabText, activeTab === i && styles.activeTabText]}
+              style={[
+                styles.tabText,
+                { color: theme.colors.onSurfaceVariant },
+                activeTab === i && styles.activeTabText,
+                activeTab === i && { color: theme.colors.primary },
+              ]}
             >
               {tab}
             </Text>
@@ -406,7 +421,7 @@ export default function TripDetailScreen() {
       {currentFABs.length === 1 && (
         <FAB
           icon={currentFABs[0].icon}
-          style={styles.fab}
+            style={[styles.fab, { backgroundColor: theme.colors.primary }]}
           onPress={currentFABs[0].onPress}
           label={currentFABs[0].label}
         />
@@ -415,13 +430,13 @@ export default function TripDetailScreen() {
         <View style={styles.fabGroup}>
           <FAB
             icon={currentFABs[1].icon}
-            style={[styles.fabSecondary]}
+            style={[styles.fabSecondary, { backgroundColor: theme.colors.primaryContainer }]}
             onPress={currentFABs[1].onPress}
             size="small"
           />
           <FAB
             icon={currentFABs[0].icon}
-            style={styles.fab}
+            style={[styles.fab, { backgroundColor: theme.colors.primary }]}
             onPress={currentFABs[0].onPress}
           />
         </View>
@@ -439,14 +454,12 @@ export default function TripDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F6F0FF" },
+  container: { flex: 1 },
   flex: { flex: 1 },
   appbarTitle: { fontWeight: "700", fontSize: 18 },
   tabBar: {
     flexDirection: "row",
-    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: "#E7E0EC",
   },
   tab: {
     flex: 1,
@@ -455,19 +468,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 3,
     borderBottomColor: "transparent",
   },
-  activeTab: { borderBottomColor: "#6750A4" },
-  tabText: { fontSize: 13, color: "#757575", fontWeight: "500" },
-  activeTabText: { color: "#6750A4", fontWeight: "700" },
+  activeTab: {},
+  tabText: { fontSize: 13, fontWeight: "500" },
+  activeTabText: { fontWeight: "700" },
   tabContent: { paddingBottom: 120, paddingTop: 8 },
   emptyTab: { alignItems: "center", marginTop: 60, padding: 24 },
   emptyText: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#49454F",
     marginTop: 12,
   },
   emptySubText: {
-    color: "#9E9E9E",
     textAlign: "center",
     marginTop: 6,
     lineHeight: 20,
@@ -483,9 +494,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 8,
   },
-  balanceLabel: { color: "#757575", marginBottom: 4 },
+  balanceLabel: { marginBottom: 4 },
   balanceAmount: { fontWeight: "800" },
-  balanceHint: { color: "#9E9E9E", marginTop: 4, fontSize: 13 },
+  balanceHint: { marginTop: 4, fontSize: 13 },
   // Members
   inviteCard: { margin: 16, borderRadius: 16, padding: 20, marginBottom: 8 },
   inviteRow: {
@@ -497,10 +508,9 @@ const styles = StyleSheet.create({
   inviteCode: {
     fontWeight: "800",
     letterSpacing: 6,
-    color: "#6750A4",
     fontSize: 28,
   },
-  inviteHint: { color: "#9E9E9E", fontSize: 12 },
+  inviteHint: { fontSize: 12 },
   membersHeader: {
     fontWeight: "700",
     marginHorizontal: 16,
@@ -514,16 +524,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
-  memberAvatar: { backgroundColor: "#D0BCFF" },
+  memberAvatar: {},
   memberInfo: { flex: 1 },
-  memberEmail: { fontSize: 12, color: "#757575" },
-  roleChip: { backgroundColor: "#EDE7F6" },
+  memberEmail: { fontSize: 12 },
+  roleChip: {},
   // FAB
   fab: {
     position: "absolute",
     right: 16,
     bottom: 24,
-    backgroundColor: "#6750A4",
   },
   fabGroup: {
     position: "absolute",
@@ -536,6 +545,5 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 22,
     bottom: 90,
-    backgroundColor: "#D0BCFF",
   },
 });

@@ -12,7 +12,7 @@ import {
   Button,
   Text,
   HelperText,
-  SegmentedButtons,
+  useTheme,
 } from "react-native-paper";
 import { router } from "expo-router";
 import { format } from "date-fns";
@@ -20,6 +20,7 @@ import useAuthStore from "../../../src/store/authStore";
 import useTripStore from "../../../src/store/tripStore";
 
 export default function CreateTripScreen() {
+  const theme = useTheme();
   const { user } = useAuthStore();
   const { addTrip } = useTripStore();
 
@@ -77,7 +78,7 @@ export default function CreateTripScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      style={styles.flex}
+      style={[styles.flex, { backgroundColor: theme.colors.background }]}
     >
       <Appbar.Header elevated>
         <Appbar.BackAction onPress={() => router.back()} />
@@ -88,7 +89,10 @@ export default function CreateTripScreen() {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <Text variant="headlineSmall" style={styles.sectionTitle}>
+        <Text
+          variant="headlineSmall"
+          style={[styles.sectionTitle, { color: theme.colors.onSurface }]}
+        >
           Trip Details
         </Text>
 
@@ -132,7 +136,10 @@ export default function CreateTripScreen() {
           {errors.destination}
         </HelperText>
 
-        <Text variant="labelLarge" style={styles.sectionTitle}>
+        <Text
+          variant="labelLarge"
+          style={[styles.sectionTitle, { color: theme.colors.onSurface }]}
+        >
           Dates
         </Text>
 
@@ -172,7 +179,10 @@ export default function CreateTripScreen() {
           {errors.endDate}
         </HelperText>
 
-        <Text variant="labelLarge" style={styles.sectionTitle}>
+        <Text
+          variant="labelLarge"
+          style={[styles.sectionTitle, { color: theme.colors.onSurface }]}
+        >
           Optional
         </Text>
 
@@ -211,12 +221,11 @@ export default function CreateTripScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: "#F6F0FF" },
+  flex: { flex: 1 },
   appbarTitle: { fontWeight: "700" },
   container: { padding: 20, paddingBottom: 60 },
   sectionTitle: {
     fontWeight: "700",
-    color: "#1D1B20",
     marginTop: 12,
     marginBottom: 4,
   },

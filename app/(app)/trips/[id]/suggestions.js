@@ -1,4 +1,4 @@
-// AI-powered activity suggestion using Groq Cloud.
+// AI-powered activity suggestion screen using Groq Cloud.
 import React, { useState, useEffect } from "react";
 import { View, FlatList, StyleSheet, TouchableOpacity } from "react-native";
 import {
@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
   Snackbar,
   Surface,
-  IconButton,
+  useTheme,
 } from "react-native-paper";
 import { useLocalSearchParams, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,6 +25,7 @@ const TIME_COLORS = {
 };
 
 export default function SuggestionsScreen() {
+  const theme = useTheme();
   const { id } = useLocalSearchParams();
   const { user } = useAuthStore();
   const { currentTrip, addActivity, setCurrentTrip } = useTripStore();
@@ -112,13 +113,13 @@ export default function SuggestionsScreen() {
             </Chip>
           </View>
 
-          <Text style={styles.description} numberOfLines={3}>
+          <Text style={[styles.description, { color: theme.colors.onSurfaceVariant }]} numberOfLines={3}>
             {item.description}
           </Text>
 
           <View style={styles.meta}>
-            <Ionicons name="cash-outline" size={14} color="#757575" />
-            <Text style={styles.metaText}>{item.approximate_cost}</Text>
+            <Ionicons name="cash-outline" size={14} color={theme.colors.onSurfaceVariant} />
+            <Text style={[styles.metaText, { color: theme.colors.onSurfaceVariant }]}>{item.approximate_cost}</Text>
           </View>
 
           {isAdded ? (
@@ -145,7 +146,7 @@ export default function SuggestionsScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Appbar.Header elevated>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content
@@ -160,13 +161,16 @@ export default function SuggestionsScreen() {
       </Appbar.Header>
 
       {/* Header info */}
-      <Surface style={styles.banner} elevation={1}>
-        <Ionicons name="hardware-chip-outline" size={28} color="#6750A4" />
+      <Surface
+        style={[styles.banner, { backgroundColor: theme.colors.secondaryContainer }]}
+        elevation={1}
+      >
+        <Ionicons name="hardware-chip-outline" size={28} color={theme.colors.primary} />
         <View style={{ flex: 1 }}>
           <Text variant="titleSmall" style={{ fontWeight: "700" }}>
             Powered by Groq AI
           </Text>
-          <Text style={styles.bannerText}>
+          <Text style={[styles.bannerText, { color: theme.colors.onSurfaceVariant }]}>
             Suggestions for {currentTrip?.destination || "your trip"} ·{" "}
             {currentTrip?.start_date} to {currentTrip?.end_date}
           </Text>
@@ -175,8 +179,8 @@ export default function SuggestionsScreen() {
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#6750A4" />
-          <Text style={styles.loadingText}>Generating ideas with AI...</Text>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={[styles.loadingText, { color: theme.colors.onSurfaceVariant }]}>Generating ideas with AI...</Text>
         </View>
       ) : (
         <FlatList
@@ -186,12 +190,12 @@ export default function SuggestionsScreen() {
           contentContainerStyle={styles.list}
           ListEmptyComponent={
             <View style={styles.empty}>
-              <Ionicons name="bulb-outline" size={56} color="#C4B5FD" />
-              <Text style={styles.emptyText}>No suggestions yet</Text>
+              <Ionicons name="bulb-outline" size={56} color={theme.colors.primary} />
+              <Text style={[styles.emptyText, { color: theme.colors.onSurface }]}>No suggestions yet</Text>
               <Button
                 mode="contained"
                 onPress={fetchSuggestions}
-                style={styles.retryBtn}
+                style={[styles.retryBtn, { backgroundColor: theme.colors.primary }]}
               >
                 Get Suggestions
               </Button>
@@ -212,23 +216,22 @@ export default function SuggestionsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F6F0FF" },
+  container: { flex: 1 },
   appbarTitle: { fontWeight: "700" },
   banner: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
     padding: 16,
-    backgroundColor: "#EDE7F6",
   },
-  bannerText: { fontSize: 12, color: "#49454F", marginTop: 2 },
+  bannerText: { fontSize: 12, marginTop: 2 },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     gap: 16,
   },
-  loadingText: { color: "#757575", fontSize: 15 },
+  loadingText: { fontSize: 15 },
   list: { padding: 16, paddingBottom: 40 },
   card: { marginBottom: 12, borderRadius: 14, elevation: 2 },
   addedCard: { opacity: 0.8, borderLeftWidth: 4, borderLeftColor: "#2E7D32" },
@@ -239,11 +242,11 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   suggestionName: { fontWeight: "700", flex: 1 },
-  timeChip: { height: 24 },
-  timeChipText: { fontSize: 10, fontWeight: "600" },
-  description: { fontSize: 13, color: "#49454F", marginTop: 8, lineHeight: 20 },
+  timeChip: {maxHeight: 28, alignSelf: "flex-start", maxWidth: 120 },
+  timeChipText: { fontSize: 10, fontWeight: "600",padding: 0, margin: 0,},
+  description: { fontSize: 13, marginTop: 8, lineHeight: 20 },
   meta: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 8 },
-  metaText: { fontSize: 12, color: "#757575" },
+  metaText: { fontSize: 12 },
   addBtn: { marginTop: 12, alignSelf: "flex-start" },
   addedRow: {
     flexDirection: "row",
@@ -256,9 +259,8 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#49454F",
     marginTop: 12,
     marginBottom: 20,
   },
-  retryBtn: { backgroundColor: "#6750A4" },
+  retryBtn: {},
 });

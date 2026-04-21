@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Card, Text, Chip, IconButton } from 'react-native-paper';
+import { Card, Text, Chip, IconButton, useTheme } from 'react-native-paper';
 import { format, parseISO } from 'date-fns';
 import { Ionicons } from '@expo/vector-icons';
 import VoteButtons from './VoteButtons';
@@ -14,6 +14,7 @@ import VoteButtons from './VoteButtons';
  *  - onDelete: () => void (optional, only if owner)
  */
 const ActivityCard = ({ activity, userId, onVote, onPress, onDelete }) => {
+  const theme = useTheme();
   const {
     name,
     datetime,
@@ -54,30 +55,30 @@ const ActivityCard = ({ activity, userId, onVote, onPress, onDelete }) => {
         </View>
 
         <View style={styles.metaRow}>
-          <Ionicons name="time-outline" size={14} color="#757575" />
-          <Text style={styles.meta}>{formattedTime}</Text>
+          <Ionicons name="time-outline" size={14} color={theme.colors.onSurfaceVariant} />
+          <Text style={[styles.meta, { color: theme.colors.onSurfaceVariant }]}>{formattedTime}</Text>
         </View>
 
         {address ? (
           <View style={styles.metaRow}>
-            <Ionicons name="location-outline" size={14} color="#757575" />
-            <Text style={styles.meta} numberOfLines={1}>{address}</Text>
+            <Ionicons name="location-outline" size={14} color={theme.colors.onSurfaceVariant} />
+            <Text style={[styles.meta, { color: theme.colors.onSurfaceVariant }]} numberOfLines={1}>{address}</Text>
           </View>
         ) : null}
 
         {cost != null && cost > 0 ? (
           <View style={styles.metaRow}>
-            <Ionicons name="cash-outline" size={14} color="#757575" />
-            <Text style={styles.meta}>${Number(cost).toFixed(2)}</Text>
+            <Ionicons name="cash-outline" size={14} color={theme.colors.onSurfaceVariant} />
+            <Text style={[styles.meta, { color: theme.colors.onSurfaceVariant }]}>${Number(cost).toFixed(2)}</Text>
           </View>
         ) : null}
 
         {notes ? (
-          <Text style={styles.notes} numberOfLines={2}>{notes}</Text>
+          <Text style={[styles.notes, { color: theme.colors.onSurfaceVariant }]} numberOfLines={2}>{notes}</Text>
         ) : null}
 
         <View style={styles.footer}>
-          <Text style={styles.addedBy}>
+          <Text style={[styles.addedBy, { color: theme.colors.onSurfaceVariant }]}>
             {profiles?.name ? `Added by ${profiles.name}` : ''}
           </Text>
           <VoteButtons
@@ -138,13 +139,11 @@ const styles = StyleSheet.create({
   },
   meta: {
     fontSize: 12,
-    color: '#757575',
     flex: 1,
   },
   notes: {
     marginTop: 6,
     fontSize: 13,
-    color: '#555',
     fontStyle: 'italic',
   },
   footer: {
@@ -155,7 +154,6 @@ const styles = StyleSheet.create({
   },
   addedBy: {
     fontSize: 11,
-    color: '#9E9E9E',
   },
 });
 
