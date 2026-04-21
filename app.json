@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "name": "GroupTrip",
+    "slug": "grouptrip",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "scheme": "grouptrip",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourname.grouptrip",
+      "config": {
+        "googleMapsApiKey": ""
+      },
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "GroupTrip uses your location to show activities near you on the map."
+      }
+    },
+    "android": {
+      "package": "com.yourname.grouptrip",
+      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow GroupTrip to use your location."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    },
+    "extra": {
+      "SUPABASE_URL": "https://your-project.supabase.co",
+      "SUPABASE_ANON_KEY": "eyJhb...",
+      "GROQ_API_KEY": "gsk_...",
+      "router": {
+        "origin": false
+      }
+    }
+  }
+}
