@@ -305,9 +305,27 @@ export const deleteExpense = async (id) => {
 
 // ─── Realtime subscriptions ──────────────────────────────────────────────────
 
+const removeExistingChannel = (channelName) => {
+  const channels = supabase.getChannels();
+  const existing = channels.find(
+    (c) =>
+      c.topic === channelName ||
+      c.topic === `realtime:${channelName}` ||
+      c.topic?.endsWith(`:${channelName}`)
+  );
+
+  if (existing) {
+    // Do not await: we only need to ensure stale channel is scheduled for removal.
+    supabase.removeChannel(existing);
+  }
+};
+
 export const subscribeToActivities = (tripId, callback) => {
-  return supabase
-    .channel(`activities:${tripId}`)
+  const channelName = `activities:${tripId}`;
+  removeExistingChannel(channelName);
+
+  const channel = supabase
+    .channel(channelName)
     .on(
       "postgres_changes",
       {
@@ -324,11 +342,16 @@ export const subscribeToActivities = (tripId, callback) => {
       callback
     )
     .subscribe();
+
+  return channel;
 };
 
 export const subscribeToExpenses = (tripId, callback) => {
-  return supabase
-    .channel(`expenses:${tripId}`)
+  const channelName = `expenses:${tripId}`;
+  removeExistingChannel(channelName);
+
+  const channel = supabase
+    .channel(channelName)
     .on(
       "postgres_changes",
       {
@@ -340,4 +363,6 @@ export const subscribeToExpenses = (tripId, callback) => {
       callback
     )
     .subscribe();
+
+  return channel;
 };
