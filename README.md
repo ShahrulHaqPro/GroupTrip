@@ -226,4 +226,4 @@ All sufficient for a working MVP with real users.
 
 ## 📄 License
 
-MIT — build freely, travel well. ✈️
+GNU GPL V2.0
