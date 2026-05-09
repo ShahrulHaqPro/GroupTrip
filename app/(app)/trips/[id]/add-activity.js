@@ -5,6 +5,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from "react-native";
 import {
   Appbar,
@@ -17,6 +18,8 @@ import {
 } from "react-native-paper";
 import { useLocalSearchParams, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { format } from "date-fns";
 import useAuthStore from "../../../../src/store/authStore";
 import useTripStore from "../../../../src/store/tripStore";
 
@@ -27,7 +30,10 @@ export default function AddActivityScreen() {
   const { addActivity } = useTripStore();
 
   const [name, setName] = useState("");
-  const [datetime, setDatetime] = useState("");
+  const [activityDate, setActivityDate] = useState(new Date());
+  const [activityTime, setActivityTime] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [address, setAddress] = useState("");
   const [lat, setLat] = useState("");
   const [lng, setLng] = useState("");
@@ -37,11 +43,20 @@ export default function AddActivityScreen() {
   const [errors, setErrors] = useState({});
   const [snack, setSnack] = useState("");
 
+  const mergeDateAndTime = (datePart, timePart) => {
+    const merged = new Date(datePart);
+    merged.setHours(timePart.getHours());
+    merged.setMinutes(timePart.getMinutes());
+    merged.setSeconds(0);
+    merged.setMilliseconds(0);
+    return merged;
+  };
+
+  const activityDateTime = mergeDateAndTime(activityDate, activityTime);
+
   const validate = () => {
     const e = {};
     if (!name.trim()) e.name = "Activity name is required";
-    if (datetime && !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(datetime))
-      e.datetime = "Use ISO format: YYYY-MM-DDTHH:MM";
     if (lat && isNaN(Number(lat))) e.lat = "Latitude must be a number";
     if (lng && isNaN(Number(lng))) e.lng = "Longitude must be a number";
     if (cost && isNaN(Number(cost))) e.cost = "Cost must be a number";
@@ -56,7 +71,7 @@ export default function AddActivityScreen() {
       await addActivity({
         trip_id: id,
         name: name.trim(),
-        datetime: datetime || null,
+        datetime: format(activityDateTime, "yyyy-MM-dd'T'HH:mm"),
         address: address.trim() || null,
         lat: lat ? Number(lat) : null,
         lng: lng ? Number(lng) : null,
@@ -107,21 +122,36 @@ export default function AddActivityScreen() {
         </HelperText>
 
         <TextInput
-          label="Date & time"
-          value={datetime}
-          onChangeText={(v) => {
-            setDatetime(v);
-            setErrors((e) => ({ ...e, datetime: "" }));
-          }}
+          label="Activity date"
+          value={format(activityDate, "MMM d, yyyy")}
           mode="outlined"
-          left={<TextInput.Icon icon="clock-outline" />}
-          placeholder="2025-07-15T14:00"
-          error={!!errors.datetime}
+          left={<TextInput.Icon icon="calendar" />}
+          right={<TextInput.Icon icon="calendar" onPress={() => setShowDatePicker(true)} />}
+          showSoftInputOnFocus={false}
+          caretHidden
+          onFocus={() => {
+            Keyboard.dismiss();
+            setShowDatePicker(true);
+          }}
           style={styles.input}
         />
-        <HelperText type={errors.datetime ? "error" : "info"} visible={true}>
-          {errors.datetime ||
-            "Format: YYYY-MM-DDTHH:MM (e.g. 2025-07-15T14:00)"}
+
+        <TextInput
+          label="Activity time"
+          value={format(activityTime, "hh:mm a")}
+          mode="outlined"
+          left={<TextInput.Icon icon="clock-outline" />}
+          right={<TextInput.Icon icon="clock-outline" onPress={() => setShowTimePicker(true)} />}
+          showSoftInputOnFocus={false}
+          caretHidden
+          onFocus={() => {
+            Keyboard.dismiss();
+            setShowTimePicker(true);
+          }}
+          style={styles.input}
+        />
+        <HelperText type="info" visible={true}>
+          Pick a date and time using the popups.
         </HelperText>
 
         <Text variant="labelLarge" style={[styles.section, { color: theme.colors.onSurface }]}> 
@@ -239,6 +269,30 @@ export default function AddActivityScreen() {
       >
         {snack}
       </Snackbar>
+
+      {showDatePicker ? (
+        <DateTimePicker
+          value={activityDate}
+          mode="date"
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={(_, selectedDate) => {
+            setShowDatePicker(false);
+            if (selectedDate) setActivityDate(selectedDate);
+          }}
+        />
+      ) : null}
+
+      {showTimePicker ? (
+        <DateTimePicker
+          value={activityTime}
+          mode="time"
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={(_, selectedTime) => {
+            setShowTimePicker(false);
+            if (selectedTime) setActivityTime(selectedTime);
+          }}
+        />
+      ) : null}
     </KeyboardAvoidingView>
   );
 }

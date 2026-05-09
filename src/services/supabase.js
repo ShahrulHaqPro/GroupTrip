@@ -133,6 +133,11 @@ export const getTripById = async (tripId) => {
   return data;
 };
 
+export const deleteTrip = async (tripId) => {
+  const { error } = await supabase.from("trips").delete().eq("id", tripId);
+  if (error) throw error;
+};
+
 export const joinTripByCode = async (inviteCode, userId) => {
   const code = inviteCode?.trim()?.toUpperCase();
   if (!code) throw new Error("Invite code is required");

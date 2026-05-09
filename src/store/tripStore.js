@@ -3,6 +3,7 @@ import {
   getUserTrips,
   createTrip,
   getTripById,
+  deleteTrip,
   joinTripByCode,
   getTripMembers,
   getActivities,
@@ -51,6 +52,14 @@ const useTripStore = create((set, get) => ({
     const trip = await createTrip(tripData, userId);
     set((state) => ({ trips: [trip, ...state.trips] }));
     return trip;
+  },
+
+  removeTrip: async (tripId) => {
+    await deleteTrip(tripId);
+    set((state) => ({
+      trips: state.trips.filter((trip) => trip.id !== tripId),
+      currentTrip: state.currentTrip?.id === tripId ? null : state.currentTrip,
+    }));
   },
 
   setCurrentTrip: async (tripId) => {

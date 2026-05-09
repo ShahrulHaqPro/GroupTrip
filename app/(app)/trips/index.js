@@ -6,6 +6,7 @@ import {
   StyleSheet,
   RefreshControl,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import {
   Text,
@@ -19,6 +20,7 @@ import {
   Card,
   Chip,
   ActivityIndicator,
+  IconButton,
 } from "react-native-paper";
 
 import { router } from "expo-router";
@@ -32,7 +34,7 @@ import useThemeStore from "../../../src/store/themeStore";
 export default function TripsScreen() {
   const theme = useTheme();
   const { user, profile, logout } = useAuthStore();
-  const { trips, loading, fetchTrips, joinTrip } = useTripStore();
+  const { trips, loading, fetchTrips, joinTrip, removeTrip } = useTripStore();
   const { isDarkMode, toggleTheme } = useThemeStore();
   const [joinVisible, setJoinVisible] = useState(false);
   const [inviteCode, setInviteCode] = useState("");
@@ -67,6 +69,28 @@ export default function TripsScreen() {
     router.replace("/(auth)/login");
   };
 
+  const confirmDeleteTrip = (trip) => {
+    Alert.alert(
+      "Delete trip?",
+      `This will permanently delete ${trip.title}. This cannot be undone.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await removeTrip(trip.id);
+              setSnack("Trip deleted");
+            } catch (e) {
+              setSnack(e.message || "Failed to delete trip");
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const statusColor = (trip) => {
     const now = new Date();
     const start = parseISO(trip.start_date);
@@ -78,6 +102,7 @@ export default function TripsScreen() {
 
   const renderTrip = ({ item }) => {
     const status = statusColor(item);
+    const isOwner = item.created_by === user?.id;
     return (
       <TouchableOpacity onPress={() => router.push(`/(app)/trips/${item.id}`)}>
         <Card style={styles.tripCard}>
@@ -96,16 +121,31 @@ export default function TripsScreen() {
                   <Text style={dynamicStyles.destination}>{item.destination}</Text>
                 </View>
               </View>
-              <Chip
-                compact
-                style={[
-                  styles.statusChip,
-                  { backgroundColor: status.color + "22" },
-                ]}
-                textStyle={[styles.statusText, { color: status.color }]}
-              >
-                {status.label}
-              </Chip>
+              <View style={styles.cardHeaderActions}>
+                <Chip
+                  compact
+                  style={[
+                    styles.statusChip,
+                    { backgroundColor: status.color + "22" },
+                  ]}
+                  textStyle={[styles.statusText, { color: status.color }]}
+                >
+                  {status.label}
+                </Chip>
+                {isOwner ? (
+                  <IconButton
+                    icon="delete-outline"
+                    size={20}
+                    iconColor="#B3261E"
+                    onPress={(e) => {
+                      e?.stopPropagation?.();
+                      confirmDeleteTrip(item);
+                    }}
+                    style={styles.deleteButton}
+                    accessibilityLabel={`Delete ${item.title}`}
+                  />
+                ) : null}
+              </View>
             </View>
             <View style={styles.dates}>
               <Ionicons name="calendar-outline" size={13} color={theme.colors.onSurfaceVariant} />
@@ -285,6 +325,8 @@ const styles = StyleSheet.create({
   list: { paddingHorizontal: 16, paddingBottom: 100 },
   tripCard: { marginVertical: 6, borderRadius: 14, elevation: 2 },
   cardHeader: { flexDirection: "row", alignItems: "flex-start", gap: 8 },
+  cardHeaderActions: { flexDirection: "row", alignItems: "center", gap: 4 },
+  deleteButton: { margin: 0 },
   destinationRow: {
     flexDirection: "row",
     alignItems: "center",

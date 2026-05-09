@@ -5,6 +5,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from "react-native";
 import {
   Appbar,
@@ -16,6 +17,7 @@ import {
 } from "react-native-paper";
 import { router } from "expo-router";
 import { format } from "date-fns";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import useAuthStore from "../../../src/store/authStore";
 import useTripStore from "../../../src/store/tripStore";
 
@@ -26,8 +28,10 @@ export default function CreateTripScreen() {
 
   const [title, setTitle] = useState("");
   const [destination, setDestination] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
   const [budget, setBudget] = useState("");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -36,12 +40,8 @@ export default function CreateTripScreen() {
     const e = {};
     if (!title.trim()) e.title = "Trip title is required";
     if (!destination.trim()) e.destination = "Destination is required";
-    if (!startDate) e.startDate = "Start date required (YYYY-MM-DD)";
-    else if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate))
-      e.startDate = "Use format YYYY-MM-DD";
-    if (!endDate) e.endDate = "End date required (YYYY-MM-DD)";
-    else if (!/^\d{4}-\d{2}-\d{2}$/.test(endDate))
-      e.endDate = "Use format YYYY-MM-DD";
+    if (!startDate) e.startDate = "Start date required";
+    if (!endDate) e.endDate = "End date required";
     else if (startDate && endDate && endDate < startDate)
       e.endDate = "End must be after start";
     if (budget && isNaN(Number(budget))) e.budget = "Budget must be a number";
@@ -61,8 +61,8 @@ export default function CreateTripScreen() {
         {
           title: title.trim(),
           destination: destination.trim(),
-          start_date: startDate,
-          end_date: endDate,
+          start_date: format(startDate, "yyyy-MM-dd"),
+          end_date: format(endDate, "yyyy-MM-dd"),
           budget: budget ? Number(budget) : null,
         },
         user.id
@@ -145,16 +145,17 @@ export default function CreateTripScreen() {
 
         <TextInput
           label="Start date *"
-          value={startDate}
-          onChangeText={(v) => {
-            setStartDate(v);
-            setErrors((e) => ({ ...e, startDate: "" }));
-          }}
+          value={format(startDate, "MMM d, yyyy")}
           mode="outlined"
           left={<TextInput.Icon icon="calendar-start" />}
+          right={<TextInput.Icon icon="calendar" onPress={() => setShowStartPicker(true)} />}
           error={!!errors.startDate}
-          placeholder="YYYY-MM-DD"
-          // keyboardType="numeric"
+          showSoftInputOnFocus={false}
+          caretHidden
+          onFocus={() => {
+            Keyboard.dismiss();
+            setShowStartPicker(true);
+          }}
           style={styles.input}
         />
         <HelperText type="error" visible={!!errors.startDate}>
@@ -163,16 +164,17 @@ export default function CreateTripScreen() {
 
         <TextInput
           label="End date *"
-          value={endDate}
-          onChangeText={(v) => {
-            setEndDate(v);
-            setErrors((e) => ({ ...e, endDate: "" }));
-          }}
+          value={format(endDate, "MMM d, yyyy")}
           mode="outlined"
           left={<TextInput.Icon icon="calendar-end" />}
+          right={<TextInput.Icon icon="calendar" onPress={() => setShowEndPicker(true)} />}
           error={!!errors.endDate}
-          placeholder="YYYY-MM-DD"
-          // keyboardType="numeric"
+          showSoftInputOnFocus={false}
+          caretHidden
+          onFocus={() => {
+            Keyboard.dismiss();
+            setShowEndPicker(true);
+          }}
           style={styles.input}
         />
         <HelperText type="error" visible={!!errors.endDate}>
@@ -215,6 +217,38 @@ export default function CreateTripScreen() {
         >
           Create Trip
         </Button>
+
+        {showStartPicker ? (
+          <DateTimePicker
+            value={startDate}
+            mode="date"
+            display={Platform.OS === "ios" ? "spinner" : "default"}
+            onChange={(_, selectedDate) => {
+              setShowStartPicker(false);
+              if (selectedDate) {
+                setStartDate(selectedDate);
+                setErrors((e) => ({ ...e, startDate: "", endDate: "" }));
+                if (selectedDate > endDate) setEndDate(selectedDate);
+              }
+            }}
+          />
+        ) : null}
+
+        {showEndPicker ? (
+          <DateTimePicker
+            value={endDate}
+            mode="date"
+            display={Platform.OS === "ios" ? "spinner" : "default"}
+            minimumDate={startDate}
+            onChange={(_, selectedDate) => {
+              setShowEndPicker(false);
+              if (selectedDate) {
+                setEndDate(selectedDate);
+                setErrors((e) => ({ ...e, endDate: "" }));
+              }
+            }}
+          />
+        ) : null}
       </ScrollView>
     </KeyboardAvoidingView>
   );
