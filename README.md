@@ -227,3 +227,77 @@ All sufficient for a working MVP with real users.
 ## 📄 License
 
 GNU GPL V2.0
+
+---
+
+# 🖼️ Screenshots
+
+## 🏠 Landing Page
+
+<p align="center">
+  <img src="assets/screenshots/Landing.jpg" width="800">
+</p>
+
+<p align="center">
+  <img src="assets/screenshots/Landing-Dark.jpg" width="800">
+</p>
+---
+
+## 🔐 Login Page
+
+<p align="center">
+  <img src="assets/screenshots/Login.jpg" width="800">
+</p>
+
+---
+
+## 📕 SignUp Page
+
+<p align="center">
+  <img src="assets/screenshots/SignUp.jpg" width="800">
+</p>
+
+---
+
+## 📊 Create Trip
+
+<p align="center">
+  <img src="assets/screenshots/AddTrip.jpg" width="800">
+</p>
+
+<p align="center">
+  <img src="assets/screenshots/AddTrip-Dark.jpg" width="800">
+</p>
+---
+
+## Activity Page
+
+<p align="center">
+  <img src="assets/screenshots/Activity.jpg" width="800">
+</p>
+
+---
+
+## 📕 Member Page
+
+<p align="center">
+  <img src="assets/screenshots/Members.jpg" width="800">
+</p>
+
+---
+
+## 📕 SignUp Page
+
+<p align="center">
+  <img src="assets/screenshots/SignUp.jpg" width="800">
+</p>
+
+---
+
+## 📕 AI Suggestion Page
+
+<p align="center">
+  <img src="assets/screenshots/Ai.jpg" width="800">
+</p>
+
+---
